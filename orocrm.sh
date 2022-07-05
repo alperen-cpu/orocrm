@@ -27,33 +27,51 @@ sed -i 's/realpath_cache_size=4096K/realpath_cache_size=4096K/' /etc/php/8.1/fpm
 sed -i 's/realpath_cache_ttl = 120/realpath_cache_ttl=600/' /etc/php/8.1/fpm/php.ini
 sed -i 's/opcache.save_comments=1/opcache.save_comments=1/' /etc/php/8.1/fpm/php.ini
 sed -i 's/opcache.validate_timestamps=1/opcache.validate_timestamps=0/' /etc/php/8.1/fpm/php.ini
+sed -i 's/opcache.enable_cli=0/opcache.enable_cli=0/' /etc/php/8.1/cli/php.ini
+sed -i 's/pm.max_children = 5/pm.max_children = 128/' /etc/php/8.1/fpm/pool.d/www.conf
+sed -i 's/pm.start_servers = 2/pm.start_servers = 8/' /etc/php/8.1/fpm/pool.d/www.conf
+sed -i 's/pm.min_spare_servers = 1/pm.min_spare_servers = 4/' /etc/php/8.1/fpm/pool.d/www.conf
+sed -i 's/pm.max_spare_servers = 3/pm.max_spare_servers = 8/' /etc/php/8.1/fpm/pool.d/www.conf
+sed -i 's/;pm.max_requests = 500/pm.max_requests = 512/' /etc/php/8.1/fpm/pool.d/www.conf
+sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/' /etc/php/8.1/fpm/pool.d/www.conf
+systemctl start php8.1-fpm.service
+systemctl enable php8.1-fpm.service
 echo "==================================== PHP SETTINGS FINISH ===================================="
-
-
-
-
-
-
-
-
-
-
-nano /etc/php/8.1/fpm/php.ini
-
-
 echo "==================================== PHP COMPOSER START ===================================="
-curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+mv composer.phar /usr/local/bin/composer
+composer -V
 echo "==================================== PHP COMPOSER FINISH ===================================="
 echo "==================================== NODE START ===================================="
 curl --silent --location https://deb.nodesource.com/setup_18.x | bash -
-apt install nodejs
+apt install nodejs -y
+node -v
 echo "==================================== NODE FINISH ===================================="
+echo "==================================== Supervisor START ===================================="
+apt install supervisor
+supervisord -v
+echo "==================================== Supervisor FINISH ===================================="
+echo "==================================== MySQL START ===================================="
+apt-get install apt-transport-https curl
+curl -o /etc/apt/trusted.gpg.d/mariadb_release_signing_key.asc 'https://mariadb.org/mariadb_release_signing_key.asc'
+sh -c "echo 'deb https://mirror.truenetwork.ru/mariadb/repo/10.8/debian bullseye main' >>/etc/apt/sources.list"
+apt-get update
+apt-get install mariadb-server -y
+mysql -uroot -p -e 'CREATE DATABASE orodb;'
+mysql -uroot -p -e 'CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'KHNUVA6P';'
+mysql -uroot -p -e 'GRANT ALL PRIVILEGES ON orodb.* TO 'orouser'@'localhost';'
+echo "==================================== MySQL FINISH ===================================="
+echo "==================================== Nginx START ===================================="
+apt-get install nginx -y
+systemctl start nginx
+systemctl enable nginx
+echo "==================================== Nginx FINISH ===================================="
 echo "==================================== APP START ===================================="
-cd /var/www/html/
-git clone https://github.com/oroinc/crm-application.git
-cd orocrm
-composer install --prefer-dist --no-dev
-php app/console oro:install --env=prod
-chown -R www-data:www-data /var/www/html/orocrm/
-chmod -R 755 /var/www/html/orocrm/
+git clone -b 4.2.8 https://github.com/oroinc/crm-application.git crm.google.com
+rmdir /var/www/crm.google.com
+mv /home/orosa/crm.google.com /var/www/
+chown -R orosa:orosa /var/www/crm.google.com
 echo "==================================== APP FINISH ===================================="
