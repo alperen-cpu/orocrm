@@ -9,7 +9,6 @@ apt install php8.1 php8.1-bcmath php8.1-common php8.1-curl php8.1-fpm php8.1-gd 
 php --modules
 php -v &&
 echo "==================================== PHP INSTALL FINISH ===================================="
-
 echo "==================================== PHP SETTINGS START ===================================="
 sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/8.1/fpm/php.ini
 sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/8.1/cli/php.ini
@@ -55,14 +54,23 @@ apt install supervisor
 supervisord -v
 echo "==================================== Supervisor FINISH ===================================="
 echo "==================================== MySQL START ===================================="
-apt-get install apt-transport-https curl
-curl -o /etc/apt/trusted.gpg.d/mariadb_release_signing_key.asc 'https://mariadb.org/mariadb_release_signing_key.asc'
-sh -c "echo 'deb https://mirror.truenetwork.ru/mariadb/repo/10.8/debian bullseye main' >>/etc/apt/sources.list"
-apt-get update
-apt-get install mariadb-server -y
-mysql -uroot -p -e 'CREATE DATABASE orodb;'
-mysql -uroot -p -e 'CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'KHNUVA6P';'
-mysql -uroot -p -e 'GRANT ALL PRIVILEGES ON orodb.* TO 'orouser'@'localhost';'
+#maridb 10.8 install
+#apt-get install apt-transport-https curl
+#curl -o /etc/apt/trusted.gpg.d/mariadb_release_signing_key.asc 'https://mariadb.org/mariadb_release_signing_key.asc'
+#sh -c "echo 'deb https://mirror.truenetwork.ru/mariadb/repo/10.8/debian bullseye main' >>/etc/apt/sources.list"
+#apt-get update
+#apt-get install mariadb-server -y
+read -p "enter mysql root password : " dbpass
+mysql --user=root --password=$dbpass -e 'CREATE DATABASE orodb;'
+mysql --user=root --password=$dbpass -e 'CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'KHNUVA6P';'
+mysql --user=root --password=$dbpass -e 'GRANT ALL PRIVILEGES ON orodb.* TO 'orouser'@'localhost';'
+mysql --user=root --password=$dbpass -e 'flush privileges;'
+mysql --user=root --password=$dbpass -e 'show databases;'
+mysql --user=root --password=$dbpass -e 'exit;'
+#root şifresi mevcut değil ise eğer,
+#mysql -uroot -p -e 'CREATE DATABASE orodb;'
+#mysql -uroot -p -e 'CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'KHNUVA6P';'
+#mysql -uroot -p -e 'GRANT ALL PRIVILEGES ON orodb.* TO 'orouser'@'localhost';'
 echo "==================================== MySQL FINISH ===================================="
 echo "==================================== Nginx START ===================================="
 apt-get install nginx -y
@@ -70,8 +78,15 @@ systemctl start nginx
 systemctl enable nginx
 echo "==================================== Nginx FINISH ===================================="
 echo "==================================== APP START ===================================="
-git clone -b 4.2.8 https://github.com/oroinc/crm-application.git crm.google.com
+git clone -b https://github.com/oroinc/crm-application.git crm.google.com
 rmdir /var/www/crm.google.com
 mv /home/orosa/crm.google.com /var/www/
 chown -R orosa:orosa /var/www/crm.google.com
+php app/console oro:install --env=prod
 echo "==================================== APP FINISH ===================================="
+
+
+
+
+
+
