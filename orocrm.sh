@@ -1,6 +1,8 @@
 clear
+echo "OroCRM Sample Application 5.0 Installation https://github.com/oroinc/crm-application "
+echo "Author: Alperen Sah Abursum"
 echo "==================================== START ===================================="
-apt-get install ca-certificates apt-transport-https software-properties-common wget curl lsb-release -y
+apt-get install ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 -y
 echo "==================================== Nginx 1.18.0 START ===================================="
 #https://www.nginx.com/resources/wiki/start/topics/tutorials/install/
 apt install git unzip build-essential openssl libssl-dev libpcre3 libpcre3-dev zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl -y
@@ -11,7 +13,6 @@ systemctl start nginx
 echo "==================================== Nginx FINISH ===================================="
 echo "==================================== PHP 8.1 INSTALL START ===================================="
 apt update
-apt install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
 wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
 apt install php8.1
