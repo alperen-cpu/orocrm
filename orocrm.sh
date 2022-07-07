@@ -1,6 +1,6 @@
 clear
-echo "OroCRM Sample Application 5.0 Installation https://github.com/oroinc/crm-application "
-echo "Author: Alperen Sah Abursum"
+echo "===================== OroCRM Sample Application 5.0 Installation https://github.com/oroinc/crm-application ====================="
+echo "===================== Author: Alperen Sah Abursum | github.com/alperen-cpu ====================="
 echo "==================================== START ===================================="
 apt-get install ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 -y
 echo "==================================== Nginx 1.18.0 START ===================================="
