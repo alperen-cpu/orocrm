@@ -1,13 +1,22 @@
 clear
 echo "==================================== START ===================================="
 apt-get install ca-certificates apt-transport-https software-properties-common wget curl lsb-release -y
-echo "==================================== PHP INSTALL START ===================================="
-wget https://packages.sury.org/php/apt.gpg && apt-key add apt.gpg
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
-apt update && apt install -y php8.1
-apt install php8.1 php8.1-bcmath php8.1-common php8.1-curl php8.1-fpm php8.1-gd php8.1-imap php8.1-intl php8.1-ldap php8.1-mbstring php8.1-mysql php8.1-mongodb php8.1-opcache php8.1-soap php8.1-tidy php8.1-xml php8.1-zip -y &&
-php --modules
-php -v &&
+echo "==================================== Nginx 1.20.2 START ===================================="
+apt install git unzip build-essential openssl libssl-dev libpcre3 libpcre3-dev zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl -y
+apt update -y
+bash <(curl -f -L -sS https://ngxpagespeed.com/install) --nginx-version 1.20.2 -a '--prefix=/etc/nginx --sbin-path=/usr/sbin/nginx --modules-path=/usr/lib/nginx/modules --conf-path=/etc/nginx/nginx.conf --error-log-path=/var/log/nginx/error.log --http-log-path=/var/log/nginx/access.log --pid-path=/var/run/nginx.pid --lock-path=/var/run/nginx.lock --http-client-body-temp-path=/var/cache/nginx/client_temp --http-proxy-temp-path=/var/cache/nginx/proxy_temp --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp --http-scgi-temp-path=/var/cache/nginx/scgi_temp --user=nginx --group=nginx --with-compat --with-file-aio --with-threads --with-http_addition_module --with-http_auth_request_module --with-http_dav_module --with-http_flv_module --with-http_gunzip_module --with-http_gzip_static_module --with-http_mp4_module --with-http_random_index_module --with-http_realip_module --with-http_secure_link_module --with-http_slice_module --with-http_ssl_module --with-http_stub_status_module --with-http_sub_module --with-http_v2_module --with-mail --with-mail_ssl_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-stream_ssl_preread_module' -y
+echo "==================================== Nginx FINISH ===================================="
+echo "==================================== PHP 8.1 INSTALL START ===================================="
+apt update
+apt install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
+apt install php8.1
+apt install php8.1-bcmath php8.1-common php8.1-curl php8.1-fpm php8.1-gd php8.1-imap php8.1-intl php8.1-ldap php8.1-mbstring php8.1-mysql php8.1-mongodb php8.1-opcache php8.1-soap php8.1-tidy php8.1-xml php8.1-zip -y
+rm -rf /usr/lib/apache2 /usr/lib/php/8.1/sapi/apache2 /usr/share/apache2 /usr/sbin/apache2 /etc/apache2 /etc/php/8.1/apache2 /var/lib/apache2 /var/lib/php/modules/8.1/apache2
+apt autoremove apache2 -y
+apt purge apache2 -y
+apt remove apache2 -y
 echo "==================================== PHP INSTALL FINISH ===================================="
 echo "==================================== PHP SETTINGS START ===================================="
 sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/8.1/fpm/php.ini
@@ -34,59 +43,35 @@ sed -i 's/pm.max_spare_servers = 3/pm.max_spare_servers = 8/' /etc/php/8.1/fpm/p
 sed -i 's/;pm.max_requests = 500/pm.max_requests = 512/' /etc/php/8.1/fpm/pool.d/www.conf
 sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/' /etc/php/8.1/fpm/pool.d/www.conf
 systemctl start php8.1-fpm.service
+/lib/systemd/systemd-sysv-install enable php8.1-fpm
 systemctl enable php8.1-fpm.service
 echo "==================================== PHP SETTINGS FINISH ===================================="
 echo "==================================== PHP COMPOSER START ===================================="
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === '906a84df04cea2aa72f40b5f787e49f22d4c2f19492ac310e8cba5b96ac8b64115ac402c8cd292b8a03482574915d1a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
-mv composer.phar /usr/local/bin/composer
-composer -V
 echo "==================================== PHP COMPOSER FINISH ===================================="
-echo "==================================== NODE START ===================================="
-curl --silent --location https://deb.nodesource.com/setup_18.x | bash -
+echo "==================================== NODE v16 START ===================================="
+curl -sL https://deb.nodesource.com/setup_16.x | bash -
+apt update -y
 apt install nodejs -y
-node -v
+npm -v && node -v
 echo "==================================== NODE FINISH ===================================="
 echo "==================================== Supervisor START ===================================="
-apt install supervisor
-supervisord -v
+apt update
+apt install python3 python3-pip
+pip install setuptools
+pip install supervisor
 echo "==================================== Supervisor FINISH ===================================="
-echo "==================================== MySQL START ===================================="
-#maridb 10.8 install
-#apt-get install apt-transport-https curl
-#curl -o /etc/apt/trusted.gpg.d/mariadb_release_signing_key.asc 'https://mariadb.org/mariadb_release_signing_key.asc'
-#sh -c "echo 'deb https://mirror.truenetwork.ru/mariadb/repo/10.8/debian bullseye main' >>/etc/apt/sources.list"
-#apt-get update
-#apt-get install mariadb-server -y
-read -p "enter mysql root password : " dbpass
-mysql --user=root --password=$dbpass -e 'CREATE DATABASE orodb;'
-mysql --user=root --password=$dbpass -e 'CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'KHNUVA6P';'
-mysql --user=root --password=$dbpass -e 'GRANT ALL PRIVILEGES ON orodb.* TO 'orouser'@'localhost';'
-mysql --user=root --password=$dbpass -e 'flush privileges;'
-mysql --user=root --password=$dbpass -e 'show databases;'
-mysql --user=root --password=$dbpass -e 'exit;'
-#root şifresi mevcut değil ise eğer,
-#mysql -uroot -p -e 'CREATE DATABASE orodb;'
-#mysql -uroot -p -e 'CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'KHNUVA6P';'
-#mysql -uroot -p -e 'GRANT ALL PRIVILEGES ON orodb.* TO 'orouser'@'localhost';'
+echo "==================================== MySQL 8.0.29 START ===================================="
+https://computingforgeeks.com/how-to-install-mysql-8-0-on-debian/
+wget https://repo.mysql.com//mysql-apt-config_0.8.22-1_all.deb
+dpkg -i mysql-apt-config_0.8.22-1_all.deb
+apt update
+apt install mysql-server -y
+read -p "Enter Root Password : " rootpass
+mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'SxdS9NpKKuZU';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL FINISH ===================================="
-echo "==================================== Nginx START ===================================="
-apt-get install nginx -y
-systemctl start nginx
-systemctl enable nginx
-echo "==================================== Nginx FINISH ===================================="
 echo "==================================== APP START ===================================="
-git clone -b https://github.com/oroinc/crm-application.git crm.google.com
-rmdir /var/www/crm.google.com
-mv /home/orosa/crm.google.com /var/www/
-chown -R orosa:orosa /var/www/crm.google.com
-php app/console oro:install --env=prod
 echo "==================================== APP FINISH ===================================="
-
-
-
-
-
-
