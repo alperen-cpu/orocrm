@@ -77,5 +77,9 @@ apt install mysql-server -y
 read -p "Enter Root Password : " rootpass
 mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'SxdS9NpKKuZU';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL FINISH ===================================="
+echo "==================================== MySQL SETTINGS START ===================================="
+echo "==================================== MySQL SETTINGS FINISH ===================================="
 echo "==================================== APP START ===================================="
 echo "==================================== APP FINISH ===================================="
+
+#https://doc.oroinc.com/backend/setup/dev-environment/community-edition/
