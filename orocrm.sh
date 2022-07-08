@@ -20,7 +20,7 @@ apt update
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
 wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
 apt update
-apt install php8.1
+apt install php8.1 -y
 apt install php8.1-bcmath php8.1-common php8.1-curl php8.1-fpm php8.1-gd php8.1-imap php8.1-intl php8.1-ldap php8.1-mbstring php8.1-mysql php8.1-mongodb php8.1-opcache php8.1-soap php8.1-tidy php8.1-xml php8.1-zip -y
 rm -rf /usr/lib/apache2 /usr/lib/php/8.1/sapi/apache2 /usr/share/apache2 /usr/sbin/apache2 /etc/apache2 /etc/php/8.1/apache2 /var/lib/apache2 /var/lib/php/modules/8.1/apache2
 apt autoremove apache2 -y
@@ -69,7 +69,7 @@ echo "==================================== NODE v16 START ======================
 echo "==================================== NODE FINISH ===================================="
 echo "==================================== Supervisor START ===================================="
 apt update
-apt install python3 python3-pip
+apt install python3 python3-pip -y
 pip install setuptools
 pip install supervisor
 echo "==================================== Supervisor FINISH ===================================="
