@@ -2,14 +2,18 @@ clear
 echo "===================== OroCRM Sample Application 5.0 Installation https://github.com/oroinc/crm-application ====================="
 echo "===================== Author: Alperen Sah Abursum | github.com/alperen-cpu ====================="
 echo "==================================== START ===================================="
-apt-get install ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 -y
-echo "==================================== Nginx 1.18.0 START ===================================="
+apt-get install zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl libpcre3 libpcre3-dev libssl-dev openssl ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 unzip build-essential -y
+echo "==================================== Nginx nginx -v START ===================================="
 #https://www.nginx.com/resources/wiki/start/topics/tutorials/install/
-apt install git unzip build-essential openssl libssl-dev libpcre3 libpcre3-dev zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl -y
-echo "## Replace $release with your corresponding Debian release. deb https://nginx.org/packages/debian/ bullseye nginx deb-src https://nginx.org/packages/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list
+#https://nginx.org/en/linux_packages.html#Debian
+curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null
+gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
+#echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/mainline/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
 apt update
 apt install nginx -y
 systemctl start nginx
+nginxsettings.txt >> /etc/nginx/conf.d/default.conf
 echo "==================================== Nginx FINISH ===================================="
 echo "==================================== PHP 8.1 INSTALL START ===================================="
 apt update
