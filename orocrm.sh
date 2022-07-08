@@ -19,6 +19,7 @@ echo "==================================== PHP 8.1 INSTALL START ===============
 apt update
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
 wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
+apt update
 apt install php8.1
 apt install php8.1-bcmath php8.1-common php8.1-curl php8.1-fpm php8.1-gd php8.1-imap php8.1-intl php8.1-ldap php8.1-mbstring php8.1-mysql php8.1-mongodb php8.1-opcache php8.1-soap php8.1-tidy php8.1-xml php8.1-zip -y
 rm -rf /usr/lib/apache2 /usr/lib/php/8.1/sapi/apache2 /usr/share/apache2 /usr/sbin/apache2 /etc/apache2 /etc/php/8.1/apache2 /var/lib/apache2 /var/lib/php/modules/8.1/apache2
@@ -61,10 +62,10 @@ php composer-setup.php
 php -r "unlink('composer-setup.php');"
 echo "==================================== PHP COMPOSER FINISH ===================================="
 echo "==================================== NODE v16 START ===================================="
-curl -sL https://deb.nodesource.com/setup_16.x | bash -
-apt update -y
-apt install nodejs -y
-npm -v && node -v
+#curl -sL https://deb.nodesource.com/setup_16.x | bash -
+#apt update -y
+#apt install nodejs -y
+#npm -v && node -v
 echo "==================================== NODE FINISH ===================================="
 echo "==================================== Supervisor START ===================================="
 apt update
