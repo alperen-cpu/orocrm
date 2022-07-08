@@ -3,18 +3,18 @@ echo "===================== OroCRM Sample Application 5.0 Installation https://g
 echo "===================== Author: Alperen Sah Abursum | github.com/alperen-cpu ====================="
 echo "==================================== START ===================================="
 apt-get install zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl libpcre3 libpcre3-dev libssl-dev openssl ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 unzip build-essential -y
-echo "==================================== Nginx nginx -v START ===================================="
+echo "==================================== Nginx 1.23.0 START ===================================="
 #https://www.nginx.com/resources/wiki/start/topics/tutorials/install/
 #https://nginx.org/en/linux_packages.html#Debian
 curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null
 gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
-#echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/mainline/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
+echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/mainline/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
+echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \ | tee /etc/apt/preferences.d/99nginx
 apt update
 apt install nginx -y
 systemctl start nginx
-nginxsettings.txt >> /etc/nginx/conf.d/default.conf
-echo "==================================== Nginx FINISH ===================================="
+#nginxsettings.txt >> /etc/nginx/conf.d/default.conf
+echo "==================================== Nginx 1.23.0 FINISH ===================================="
 echo "==================================== PHP 8.1 INSTALL START ===================================="
 apt update
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
@@ -81,8 +81,6 @@ apt install mysql-server -y
 read -p "Enter Root Password : " rootpass
 mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'SxdS9NpKKuZU';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL FINISH ===================================="
-echo "==================================== MySQL SETTINGS START ===================================="
-echo "==================================== MySQL SETTINGS FINISH ===================================="
 echo "==================================== APP START ===================================="
 echo "==================================== APP FINISH ===================================="
 
