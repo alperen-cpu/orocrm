@@ -2,17 +2,17 @@ clear
 echo "===================== OroCRM Sample Application 5.0 Installation https://github.com/oroinc/crm-application ====================="
 echo "===================== Author: Alperen Sah Abursum | github.com/alperen-cpu ====================="
 echo "==================================== START ===================================="
-apt-get install zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl libpcre3 libpcre3-dev libssl-dev openssl ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 unzip build-essential -y
+apt-get install sudo zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev curl libpcre3 libpcre3-dev libssl-dev openssl ca-certificates apt-transport-https software-properties-common wget curl lsb-release gnupg2 unzip build-essential -y
 echo "==================================== Nginx 1.23.0 START ===================================="
 #https://www.nginx.com/resources/wiki/start/topics/tutorials/install/
 #https://nginx.org/en/linux_packages.html#Debian
-#curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null
-#gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-#echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/mainline/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
-#echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \ | tee /etc/apt/preferences.d/99nginx
-#apt update
-#apt install nginx -y
-#systemctl start nginx
+curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg > /dev/null
+gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \ http://nginx.org/packages/debian `lsb_release -cs` nginx" \ | tee /etc/apt/sources.list.d/nginx.list
+echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \ | tee /etc/apt/preferences.d/99nginx
+apt update
+apt install nginx -y
+systemctl stop nginx
 #nginxsettings.txt >> /etc/nginx/conf.d/default.conf
 echo "==================================== Nginx 1.23.0 FINISH ===================================="
 echo "==================================== PHP 8.1 INSTALL START ===================================="
@@ -60,12 +60,13 @@ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
+mv composer.phar /usr/local/bin/composer
 echo "==================================== PHP COMPOSER FINISH ===================================="
 echo "==================================== NODE v16 START ===================================="
-#curl -sL https://deb.nodesource.com/setup_16.x | bash -
-#apt update -y
-#apt install nodejs -y
-#npm -v && node -v
+curl -sL https://deb.nodesource.com/setup_16.x | bash -
+apt update -y
+apt-get install -y nodejs
+npm -v && node -v
 echo "==================================== NODE FINISH ===================================="
 echo "==================================== Supervisor START ===================================="
 apt update
@@ -75,14 +76,12 @@ pip install supervisor
 echo "==================================== Supervisor FINISH ===================================="
 echo "==================================== MySQL 8.0.29 START ===================================="
 #https://computingforgeeks.com/how-to-install-mysql-8-0-on-debian/
-#wget https://repo.mysql.com//mysql-apt-config_0.8.22-1_all.deb
-#dpkg -i mysql-apt-config_0.8.22-1_all.deb
-#apt update
-#apt install mysql-server -y
+wget https://repo.mysql.com//mysql-apt-config_0.8.22-1_all.deb
+dpkg -i mysql-apt-config_0.8.22-1_all.deb
+apt update
+apt install mysql-server -y
 read -p "Enter Root Password : " rootpass
 mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'SxdS9NpKKuZU';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL FINISH ===================================="
 echo "==================================== APP START ===================================="
 echo "==================================== APP FINISH ===================================="
-
-#https://doc.oroinc.com/backend/setup/dev-environment/community-edition/
