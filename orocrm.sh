@@ -88,8 +88,8 @@ wget https://repo.mysql.com//mysql-apt-config_0.8.22-1_all.deb
 dpkg -i mysql-apt-config_0.8.22-1_all.deb
 apt update
 apt install mysql-server -y
-read -p "Enter Root Password : " rootpass
-mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'SxdS9NpKKuZU';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
+read -p "Enter Root MYSQL Password : " rootpass
+mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY 'pass';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL FINISH ===================================="
 echo "==================================== APP START ===================================="
 echo "==================================== APP FINISH ===================================="
