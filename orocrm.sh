@@ -95,5 +95,6 @@ stty echo
 mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY '$newpass';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL FINISH ===================================="
 echo "==================================== APP START ===================================="
+composer create-project oro/crm-application my_project_name 5.0.0 -n
 echo "==================================== APP FINISH ===================================="
 
