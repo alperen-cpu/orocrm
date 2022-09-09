@@ -1,4 +1,9 @@
+#!/bin/bash
+# Author: Alperen Sah
+#Date 08.09.2022
 clear
+PHP_VERSION=8.1
+apt update -y
 echo "===================== OroCRM Sample Application 5.0 Installation https://github.com/oroinc/crm-application ====================="
 echo "===================== Author: Alperen Sah Abursum | github.com/alperen-cpu ====================="
 echo "==================================== START ===================================="
@@ -6,63 +11,38 @@ apt-get install sudo zlib1g zlib1g-dev libgd-dev libxml2 libxml2-dev uuid-dev cu
 echo "==================================== Nginx 1.23.0 START ===================================="
 #https://www.nginx.com/resources/wiki/start/topics/tutorials/install/
 #https://nginx.org/en/linux_packages.html#Debian
+apt update -y
 curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor \
     | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
 
 gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
 
 echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] \
-http://nginx.org/packages/debian `lsb_release -cs` nginx" \
+http://nginx.org/packages/mainline/debian `lsb_release -cs` nginx" \
     | sudo tee /etc/apt/sources.list.d/nginx.list
 
-apt update
+apt update -y
 
 echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \
-    | sudo tee /etc/apt/preferences.d/99nginx    
+    | sudo tee /etc/apt/preferences.d/99nginx  
 
+apt update -y
 apt install nginx -y
-systemctl stop nginx
-#nginxsettings.txt >> /etc/nginx/conf.d/default.conf
+service nginx stop
 echo "==================================== Nginx 1.23.0 FINISH ===================================="
-echo "==================================== PHP 8.1 INSTALL START ===================================="
-apt update
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
-wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
-apt update
-apt install php8.1 -y
-apt install php8.1-bcmath php8.1-common php8.1-curl php8.1-fpm php8.1-gd php8.1-imap php8.1-intl php8.1-ldap php8.1-mbstring php8.1-mysql php8.1-mongodb php8.1-opcache php8.1-soap php8.1-tidy php8.1-xml php8.1-zip -y
-rm -rf /usr/lib/apache2 /usr/lib/php/8.1/sapi/apache2 /usr/share/apache2 /usr/sbin/apache2 /etc/apache2 /etc/php/8.1/apache2 /var/lib/apache2 /var/lib/php/modules/8.1/apache2
-apt autoremove apache2 -y
-apt purge apache2 -y
-apt remove apache2 -y
+echo "==================================== PHP $PHP_VERSION INSTALL START ===================================="
+apt-get install software-properties-common
+wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
+apt update -y
+apt-get install php$PHP_VERSION php$PHP_VERSION-fpm -y
 echo "==================================== PHP INSTALL FINISH ===================================="
 echo "==================================== PHP SETTINGS START ===================================="
-sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/8.1/fpm/php.ini
-sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/8.1/cli/php.ini
-sed -i 's/memory_limit = 128M/memory_limit = 1G/' /etc/php/8.1/fpm/php.ini
-sed -i 's/max_execution_time = 30/max_execution_time = 60/' /etc/php/8.1/fpm/php.ini
-sed -i 's/max_execution_time = 30/max_execution_time = 60/' /etc/php/8.1/cli/php.ini
-echo 'detect_unicode = Off' | tee -a /etc/php/8.1/fpm/php.ini
-echo 'detect_unicode = Off' | tee -a /etc/php/8.1/cli/php.ini
-sed -i 's/opcache.enable=1/opcache.enable=1/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.enable_cli=0/opcache.enable_cli=0/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.memory_consumption=128/opcache.memory_consumption=512/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.max_accelerated_files=10000/opcache.max_accelerated_files=65407/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=32/' /etc/php/8.1/fpm/php.ini
-sed -i 's/realpath_cache_size=4096K/realpath_cache_size=4096K/' /etc/php/8.1/fpm/php.ini
-sed -i 's/realpath_cache_ttl = 120/realpath_cache_ttl=600/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.save_comments=1/opcache.save_comments=1/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.validate_timestamps=1/opcache.validate_timestamps=0/' /etc/php/8.1/fpm/php.ini
-sed -i 's/opcache.enable_cli=0/opcache.enable_cli=0/' /etc/php/8.1/cli/php.ini
-sed -i 's/pm.max_children = 5/pm.max_children = 128/' /etc/php/8.1/fpm/pool.d/www.conf
-sed -i 's/pm.start_servers = 2/pm.start_servers = 8/' /etc/php/8.1/fpm/pool.d/www.conf
-sed -i 's/pm.min_spare_servers = 1/pm.min_spare_servers = 4/' /etc/php/8.1/fpm/pool.d/www.conf
-sed -i 's/pm.max_spare_servers = 3/pm.max_spare_servers = 8/' /etc/php/8.1/fpm/pool.d/www.conf
-sed -i 's/;pm.max_requests = 500/pm.max_requests = 512/' /etc/php/8.1/fpm/pool.d/www.conf
-sed -i 's/;catch_workers_output = yes/catch_workers_output = yes/' /etc/php/8.1/fpm/pool.d/www.conf
-systemctl start php8.1-fpm.service
-/lib/systemd/systemd-sysv-install enable php8.1-fpm
-systemctl enable php8.1-fpm.service
+sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/$PHP_VERSION/fpm/php.ini
+sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/$PHP_VERSION/cli/php.ini
+sed -i 's/memory_limit = 128M/memory_limit = 1G/' /etc/php/$PHP_VERSION/fpm/php.ini
+sed -i 's/realpath_cache_ttl = 120/realpath_cache_ttl=600/' /etc/php/$PHP_VERSION/fpm/php.ini
+systemctl restart php-fpm8.1
 echo "==================================== PHP SETTINGS FINISH ===================================="
 echo "==================================== PHP COMPOSER START ===================================="
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -76,7 +56,7 @@ curl -sL https://deb.nodesource.com/setup_16.x | bash -
 apt update -y
 apt-get install -y nodejs
 npm -v && node -v
-echo "==================================== NODE FINISH ===================================="
+echo "==================================== NODE v16 FINISH ===================================="
 echo "==================================== Supervisor START ===================================="
 apt update
 apt install python3 python3-pip -y
@@ -94,8 +74,8 @@ read -p "Enter Root MYSQL Password : " rootpass
 read -p "Enter New User Password: " newpass
 stty echo
 mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY '$newpass';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
-echo "==================================== MySQL FINISH ===================================="
+echo "==================================== MySQL 8.0.29 FINISH ===================================="
 echo "==================================== APP START ===================================="
-composer create-project oro/crm-application my_project_name 5.0.0 -n
+composer create-project oro/crm-application orocrm 5.0.0 -n
 echo "==================================== APP FINISH ===================================="
 
