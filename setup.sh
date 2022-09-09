@@ -36,13 +36,23 @@ wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
 apt update -y
 apt-get install php$PHP_VERSION php$PHP_VERSION-fpm -y
+apt-get install php8.1-curl -y &&
+apt-get install php8.1-dom -y &&
+apt-get install php8.1-simplexml -y &&
+apt-get install php8.1-xml -y &&
+apt-get install php8.1-zip -y &&
+apt-get install php8.1-gd -y &&
+apt-get install php8.1-intl -y
+apt update -y
 echo "==================================== PHP INSTALL FINISH ===================================="
 echo "==================================== PHP SETTINGS START ===================================="
 sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/$PHP_VERSION/fpm/php.ini
 sed -i 's#;date.timezone =#date.timezone = Europe/Istanbul#' /etc/php/$PHP_VERSION/cli/php.ini
 sed -i 's/memory_limit = 128M/memory_limit = 1G/' /etc/php/$PHP_VERSION/fpm/php.ini
 sed -i 's/realpath_cache_ttl = 120/realpath_cache_ttl=600/' /etc/php/$PHP_VERSION/fpm/php.ini
-systemctl restart php-fpm8.1
+sed -i 's/listen.owner \= www-data/listen.owner \= nginx/g' /etc/php/8.1/fpm/pool.d/www.conf
+sed -i 's/listen.group \= www-data/listen.group \= nginx/g' /etc/php/8.1/fpm/pool.d/www.conf
+service php8.1-fpm restart
 echo "==================================== PHP SETTINGS FINISH ===================================="
 echo "==================================== PHP COMPOSER START ===================================="
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -76,6 +86,9 @@ stty echo
 mysql --user=root --password=$rootpass -e "CREATE DATABASE orodb;use orodb;CREATE USER 'orouser'@'localhost' IDENTIFIED BY '$newpass';GRANT ALL PRIVILEGES ON orodb.* TO orouser@'localhost';FLUSH PRIVILEGES;"
 echo "==================================== MySQL 8.0.29 FINISH ===================================="
 echo "==================================== APP START ===================================="
-composer create-project oro/crm-application orocrm 5.0.0 -n
+cd /usr/share/nginx/html/
+git clone -b 5.0 https://github.com/oroinc/crm-application.git orocrm
+cd orocrm
+composer install --prefer-dist --no-dev
 echo "==================================== APP FINISH ===================================="
 
